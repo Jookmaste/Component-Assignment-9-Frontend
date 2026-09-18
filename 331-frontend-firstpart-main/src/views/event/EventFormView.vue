@@ -1,0 +1,90 @@
+<script setup lang="ts">
+import type { Event } from '@/types'
+import { ref } from 'vue'
+import EventService from '@/services/EventService'
+import { useRouter } from 'vue-router'
+import { useMessageStore } from '@/stores/message'
+
+const event = ref<Event>({
+  id: null,
+  category: '',
+  title: '',
+  description: '',
+  location: '',
+  date: '',
+  time: '',
+  petsAllowed: false,
+  organizer: {
+    id: 0,
+    name: ''
+  }
+})
+
+const router = useRouter()
+const store = useMessageStore()
+
+function saveEvent() {
+  EventService.saveEvent(event.value)
+    .then((response) => {
+      router.push({ name: 'event-detail-view', params: { id: response.data.id } })
+      store.updateMessage('You are successfully add a new event for ' + response.data.title)
+      setTimeout(() => {
+        store.resetMessage()
+      }, 3000)
+    })
+    .catch(() => {
+      router.push({ name: 'network-error-view' })
+    })
+}
+</script>
+
+<template>
+  <div>
+    <h1>Create an event</h1>
+    <form @submit.prevent="saveEvent">
+      <h3>Name & describe your event</h3>
+      <label class="block text-gray-500 font-bold">Category</label>
+      <input
+        v-model="event.category"
+        type="text"
+        placeholder="Category"
+        class="h-13 w-full px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
+      />
+
+      <h3>Name & describe your event</h3>
+      <label class="block text-gray-500 font-bold">Title</label>
+      <input
+        v-model="event.title"
+        type="text"
+        placeholder="Title"
+        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
+      />
+
+      <label class="block text-gray-500 font-bold">Description</label>
+      <input
+        v-model="event.description"
+        type="text"
+        placeholder="Description"
+        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
+      />
+
+      <h3>Where is your event?</h3>
+      <label class="block text-gray-500 font-bold">Location</label>
+      <input
+        v-model="event.location"
+        type="text"
+        placeholder="Location"
+        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
+      />
+
+      <button
+        class="flex w-fit mx-auto items-center justify-center h-13 px-10 rounded-md font-semibold whitespace-nowrap border border-gray-400 focus:border-emerald-500 transition-all duration-200 ease-linear hover:scale-105 hover:border-emerald-500 hover:shadow-lg active:scale-100 focus:outline-none"
+        type="submit"
+      >
+        Submit
+      </button>
+    </form>
+
+    <pre>{{ event }}</pre>
+  </div>
+</template>
