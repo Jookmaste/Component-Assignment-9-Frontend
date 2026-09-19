@@ -11,4 +11,5 @@ const { event } = toRefs(props)
 <template>
   <p>{{ event.title }} @ {{ event.location }}</p>
   <p>{{ event.description }}</p>
+  <p>Organized by: {{ event.organizer?.name }}</p>
 </template>
