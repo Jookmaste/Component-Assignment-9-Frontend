@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import EventService from '@/services/EventService'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
+import BaseInput from '@/components/BaseInput.vue'
 
 const event = ref<Event>({
   id: null,
@@ -42,40 +43,14 @@ function saveEvent() {
   <div>
     <h1>Create an event</h1>
     <form @submit.prevent="saveEvent">
-      <h3>Name & describe your event</h3>
-      <label class="block text-gray-500 font-bold">Category</label>
-      <input
-        v-model="event.category"
-        type="text"
-        placeholder="Category"
-        class="h-13 w-full px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
-      />
+      <BaseInput v-model="event.category" type="text" label="Category" />
 
       <h3>Name & describe your event</h3>
-      <label class="block text-gray-500 font-bold">Title</label>
-      <input
-        v-model="event.title"
-        type="text"
-        placeholder="Title"
-        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
-      />
-
-      <label class="block text-gray-500 font-bold">Description</label>
-      <input
-        v-model="event.description"
-        type="text"
-        placeholder="Description"
-        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
-      />
+      <BaseInput v-model="event.title" type="text" label="Title" />
+      <BaseInput v-model="event.description" type="text" label="Description" />
 
       <h3>Where is your event?</h3>
-      <label class="block text-gray-500 font-bold">Location</label>
-      <input
-        v-model="event.location"
-        type="text"
-        placeholder="Location"
-        class="h-13 w-1/4 px-2.5 text-xl border border-gray-400 focus:border-emerald-500 focus:outline-none mb-6"
-      />
+      <BaseInput v-model="event.location" type="text" label="Location" />
 
       <button
         class="flex w-fit mx-auto items-center justify-center h-13 px-10 rounded-md font-semibold whitespace-nowrap border border-gray-400 focus:border-emerald-500 transition-all duration-200 ease-linear hover:scale-105 hover:border-emerald-500 hover:shadow-lg active:scale-100 focus:outline-none"
