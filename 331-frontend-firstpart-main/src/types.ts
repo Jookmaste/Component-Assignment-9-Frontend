@@ -19,6 +19,7 @@ export interface EventState {
 }
 
 export interface Organizer {
-  id: number
+  id: number | null 
   name: string
+  address?: string  
 }
