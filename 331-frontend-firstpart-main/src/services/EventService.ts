@@ -13,6 +13,11 @@ export default {
   getEvents(_perPage: number, _page: number) {
     return apiClient.get('/events?_limit=' + _perPage + '&_page=' + _page)
   },
+  getEventsByKeyword(keyword: string, _perPage: number, _page: number) {
+    return apiClient.get(
+      '/events?title=' + encodeURIComponent(keyword) + '&_limit=' + _perPage + '&_page=' + _page
+    )
+  },
   getEvent(id: number) {
     return apiClient.get('/events/' + id)
   },

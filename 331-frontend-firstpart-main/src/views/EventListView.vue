@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import EventService from '@/services/EventService'
 import EventCard from '@/components/EventCard.vue'
+import BaseInput from '@/components/BaseInput.vue'
 import type { Event } from '@/types'
 import { ref, onMounted, computed, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 const events = ref<Event[] | null>(null)
 const totalEvents = ref<number>(0)
-const hasNextPage = computed(() => {
-  const totalPages = Math.ceil(totalEvents.value / 3)
-  return page.value < totalPages
-})
+const keyword = ref('')
+
 const props = defineProps({
   page: {
     type: Number,
@@ -16,17 +18,31 @@ const props = defineProps({
   },
 })
 const page = computed(() => props.page)
+
+const hasNextPage = computed(() => {
+  const totalPages = Math.ceil(totalEvents.value / 4)
+  return page.value < totalPages
+})
+
+function fetchEvents() {
+  const request =
+    keyword.value === ''
+      ? EventService.getEvents(4, page.value)
+      : EventService.getEventsByKeyword(keyword.value, 3, page.value)
+
+  request
+    .then((response) => {
+      events.value = response.data
+      totalEvents.value = response.headers['x-total-count']
+    })
+    .catch(() => {
+      router.push({ name: 'network-error-view' })
+    })
+}
+
 onMounted(() => {
-  events.value = null
   watchEffect(() => {
-    EventService.getEvents(3, page.value)
-      .then((response) => {
-        events.value = response.data
-        totalEvents.value = response.headers['x-total-count']
-      })
-      .catch((error) => {
-        console.error('There was an error!', error)
-      })
+    fetchEvents()
   })
 })
 </script>
@@ -34,6 +50,14 @@ onMounted(() => {
 <template>
   <h1>Events For Good</h1>
   <div class="flex flex-col items-center">
+    <div class="w-80 mb-4">
+      <BaseInput
+        v-model="keyword"
+        type="text"
+        label="Search..."
+      />
+    </div>
+
     <EventCard v-for="event in events" :key="event.id" :event="event" />
 
     <div class="pagination">
