@@ -5,8 +5,8 @@ import OrganizerService from '@/services/OrganizerService'
 import { useRouter } from 'vue-router'
 import { useMessageStore } from '@/stores/message'
 
-const organizer = ref<Organizer>({
-  id: null,
+// ปรับให้ไม่มี id ตั้งแต่แรก หรือใช้ Partial<Organizer> เพื่อไม่ให้ส่ง id: null ไปยัง Backend
+const organizer = ref<Omit<Organizer, 'id'>>({
   name: '',
   address: ''
 })
@@ -15,13 +15,14 @@ const router = useRouter()
 const store = useMessageStore()
 
 function saveOrganizer() {
-  OrganizerService.saveOrganizer(organizer.value)
+  OrganizerService.saveOrganizer(organizer.value as Organizer)
     .then((response) => {
       store.updateMessage('Successfully added organizer: ' + response.data.name)
       setTimeout(() => {
         store.resetMessage()
       }, 3000)
-      router.push({ name: 'organizer-list-view' }) // หรือหน้าแสดงผลรายการที่ต้องการ
+      // แก้ไขชื่อ Route ให้ตรงกับใน index.ts (event-list-view)
+      router.push({ name: 'event-list-view' })
     })
     .catch(() => {
       router.push({ name: 'network-error-view' })

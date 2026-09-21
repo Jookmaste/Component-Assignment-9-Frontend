@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 const store = useEventStore()
 const { event } = storeToRefs(store)
 </script>
+
 <template>
   <div v-if="event">
     <h1>{{ event.title }}</h1>
@@ -15,6 +16,7 @@ const { event } = storeToRefs(store)
       |
       <RouterLink :to="{ name: 'event-edit-view' }">Edit</RouterLink>
     </nav>
+
     <RouterView :event="event" />
   </div>
 </template>

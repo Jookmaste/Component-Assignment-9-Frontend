@@ -32,22 +32,24 @@ onMounted(() => {
     .then((response) => {
       organizers.value = response.data
     })
-    .catch(() => {
-      router.push({ name: 'network-error-view' })
+    .catch((error) => {
+      console.error('Failed to load organizers:', error)
+      // ไม่ต้องสั่ง router.push ไปหน้า network-error-view เพื่อป้องกันหน้าค้างขณะ Render
     })
 })
 
 function saveEvent() {
   EventService.saveEvent(event.value)
     .then((response) => {
+      // เมื่อเซฟสำเร็จ ให้ Push ไปหน้า event-detail-view
       router.push({ name: 'event-detail-view', params: { id: response.data.id } })
       store.updateMessage('You are successfully add a new event for ' + response.data.title)
       setTimeout(() => {
         store.resetMessage()
       }, 3000)
     })
-    .catch(() => {
-      router.push({ name: 'network-error-view' })
+    .catch((error) => {
+      console.error('Failed to save event:', error)
     })
 }
 </script>
@@ -66,7 +68,7 @@ function saveEvent() {
       <BaseInput v-model="event.location" type="text" label="Location" />
 
       <h3>Who is your organizer?</h3>
-      <BaseSelect
+      <BaseSelect v-if="organizers.length"
         v-model="event.organizer.id"
         :options="organizers"
         label="Select an Organizer"

@@ -1,3 +1,4 @@
+import type { Organizer } from '@/types'
 import axios from 'axios'
 
 const apiClient = axios.create({
@@ -12,5 +13,8 @@ const apiClient = axios.create({
 export default {
   getOrganizers() {
     return apiClient.get('/organizers')
+  },
+  saveOrganizer(organizer: Organizer) {
+    return apiClient.post('/organizers', organizer)
   }
 }

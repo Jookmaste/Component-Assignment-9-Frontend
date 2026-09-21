@@ -30,34 +30,35 @@ const router = createRouter({
     {
       path: '/add-event',
       name: 'add-event',
-      component: AddEventView
+      component: AddEventView,
     },
     {
       path: '/add-organizer',
       name: 'add-organizer',
-      component: AddOrganizerView
+      component: AddOrganizerView,
     },
     {
       path: '/event/:id',
       name: 'event-layout-view',
       component: EventLayoutView,
       props: true,
-      beforeEnter: (to) => {
+      beforeEnter: (to, from, next) => {
         const id = parseInt(to.params.id as string)
-        const eventStore = useEventStore()
-        return EventService.getEvent(id)
+
+        EventService.getEvent(id)
           .then((response) => {
-            // need to setup the data for the event
+            const eventStore = useEventStore()
             eventStore.setEvent(response.data)
+            next()
           })
           .catch((error) => {
             if (error.response && error.response.status === 404) {
-              return {
+              next({
                 name: '404-resource-view',
                 params: { resource: 'event' },
-              }
+              })
             } else {
-              return { name: 'network-error-view' }
+              next({ name: 'network-error-view' })
             }
           })
       },
@@ -90,11 +91,11 @@ const router = createRouter({
       name: 'network-error-view',
       component: NetworkErrorView,
     },
-
     {
       path: '/:catchAll(.*)*',
       name: 'not-found',
       component: NotFoundView,
+      props: { resource: 'page' },
     },
   ],
   scrollBehavior(to, from, savedPosition) {
@@ -113,4 +114,5 @@ router.beforeEach(() => {
 router.afterEach(() => {
   nProgress.done()
 })
+
 export default router
