@@ -1,17 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import EventService from '@/services/EventService'
 import EventListView from '@/views/EventListView.vue'
-import AboutView from '@/views/AboutView.vue'
+import StudentListView from '@/views/StudentListView.vue'
 import EventDetailView from '@/views/event/DetailView.vue'
-import EventRegisterView from '@/views/event/RegisterView.vue'
-import EventEditView from '@/views/event/EditView.vue'
-import EventLayoutView from '@/views/event/LayoutView.vue'
+import RegisterView from '@/views/event/RegisterView.vue'
+import EditView from '@/views/event/EditView.vue'
+import LayoutView from '@/views/event/LayoutView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
 import NetworkErrorView from '@/views/NetworkErrorView.vue'
 import nProgress from 'nprogress'
+import EventService from '@/services/EventService'
 import { useEventStore } from '@/stores/event'
-import AddEventView from '@/views/event/EventFormView.vue'
-import AddOrganizerView from '@/views/organizer/OrganizerFormView.vue'
+import EventFormView from '@/views/event/EventFormView.vue'
+import OrganizerFormView from '@/views/event/OrganizerFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -20,65 +20,25 @@ const router = createRouter({
       path: '/',
       name: 'event-list-view',
       component: EventListView,
-      props: (route) => ({ page: parseInt(route.query.page as string) || 1 }),
-    },
-    {
-      path: '/about',
-      name: 'about',
-      component: AboutView,
+      props: (route) => ({
+        page: parseInt(route.query.page ? route.query.page.toString() : '1'),
+        totalPage: parseInt(route.query._limit ? route.query._limit.toString() : '2'),
+      }),
     },
     {
       path: '/add-event',
       name: 'add-event',
-      component: AddEventView,
+      component: EventFormView,
     },
     {
       path: '/add-organizer',
       name: 'add-organizer',
-      component: AddOrganizerView,
+      component: OrganizerFormView,
     },
     {
-      path: '/event/:id',
-      name: 'event-layout-view',
-      component: EventLayoutView,
-      props: true,
-      beforeEnter: (to, from, next) => {
-        const id = parseInt(to.params.id as string)
-
-        EventService.getEvent(id)
-          .then((response) => {
-            const eventStore = useEventStore()
-            eventStore.setEvent(response.data)
-            next()
-          })
-          .catch((error) => {
-            if (error.response && error.response.status === 404) {
-              next({
-                name: '404-resource-view',
-                params: { resource: 'event' },
-              })
-            } else {
-              next({ name: 'network-error-view' })
-            }
-          })
-      },
-      children: [
-        {
-          path: '',
-          name: 'event-detail-view',
-          component: EventDetailView,
-        },
-        {
-          path: 'register',
-          name: 'event-register-view',
-          component: EventRegisterView,
-        },
-        {
-          path: 'edit',
-          name: 'event-edit-view',
-          component: EventEditView,
-        },
-      ],
+      path: '/students',
+      name: 'student-list-view',
+      component: StudentListView,
     },
     {
       path: '/404/:resource',
@@ -92,10 +52,54 @@ const router = createRouter({
       component: NetworkErrorView,
     },
     {
-      path: '/:catchAll(.*)*',
+      path: '/:catchAll(.*)',
       name: 'not-found',
       component: NotFoundView,
-      props: { resource: 'page' },
+    },
+    {
+      path: '/event/:id',
+      name: 'event-layout-view',
+      component: LayoutView,
+      props: true,
+      beforeEnter: (to) => {
+        // API CALL HERE
+        const id = parseInt(to.params.id as string)
+        const eventStore = useEventStore()
+        return EventService.getEvent(id)
+          .then((res) => {
+            eventStore.setEvent(res.data)
+          })
+          .catch((err) => {
+            if (err.response && err.response.status === 404) {
+              return {
+                name: '404-resource-view',
+                params: { resource: 'event' },
+              }
+            } else {
+              return { name: 'network-error-view' }
+            }
+          })
+      },
+      children: [
+        {
+          path: '',
+          name: 'event-detail-view',
+          component: EventDetailView,
+          props: true,
+        },
+        {
+          path: 'register',
+          name: 'event-register-view',
+          component: RegisterView,
+          props: true,
+        },
+        {
+          path: 'edit',
+          name: 'event-edit-view',
+          component: EditView,
+          props: true,
+        },
+      ],
     },
   ],
   scrollBehavior(to, from, savedPosition) {

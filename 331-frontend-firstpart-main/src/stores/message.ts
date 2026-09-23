@@ -6,10 +6,10 @@ export const useMessageStore = defineStore('message', {
     message: '',
   }),
   actions: {
-    updateMessage(message: string) {
+    updateMessage(message: string): void {
       this.message = message
     },
-    resetMessage() {
+    resetMessage(): void {
       this.message = ''
     },
   },

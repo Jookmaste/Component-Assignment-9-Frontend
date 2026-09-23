@@ -6,15 +6,15 @@ const apiClient = axios.create({
   withCredentials: false,
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json'
-  }
+    'Content-Type': 'application/json',
+  },
 })
 
 export default {
   getOrganizers() {
-    return apiClient.get('/organizers')
+    return apiClient.get('organizers')
   },
   saveOrganizer(organizer: Organizer) {
     return apiClient.post('/organizers', organizer)
-  }
+  },
 }

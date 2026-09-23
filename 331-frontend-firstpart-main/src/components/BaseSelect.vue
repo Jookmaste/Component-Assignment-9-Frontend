@@ -1,85 +1,32 @@
 <script setup lang="ts">
-import type { Event, Organizer } from '@/types'
-import { ref, onMounted } from 'vue'
-import EventService from '@/services/EventService'
-import OrganizerService from '@/services/OrganizerService'
-import { useRouter } from 'vue-router'
-import { useMessageStore } from '@/stores/message'
-import BaseInput from '@/components/BaseInput.vue'
-import BaseSelect from '@/components/BaseSelect.vue'
+import type { Organizer } from '@/types';
 
-const event = ref<Event>({
-  id: null,
-  category: '',
-  title: '',
-  description: '',
-  location: '',
-  date: '',
-  time: '',
-  petsAllowed: false,
-  organizer: {
-    id: 0,
-    name: ''
-  }
-})
-
-const organizers = ref<Organizer[]>([])
-const router = useRouter()
-const store = useMessageStore()
-
-onMounted(() => {
-  OrganizerService.getOrganizers()
-    .then((response) => {
-      organizers.value = response.data
-    })
-    .catch(() => {
-      router.push({ name: 'network-error-view' })
-    })
-})
-
-function saveEvent() {
-  EventService.saveEvent(event.value)
-    .then((response) => {
-      router.push({ name: 'event-detail-view', params: { id: response.data.id } })
-      store.updateMessage('You are successfully add a new event for ' + response.data.title)
-      setTimeout(() => {
-        store.resetMessage()
-      }, 3000)
-    })
-    .catch(() => {
-      router.push({ name: 'network-error-view' })
-    })
+const modelValue = defineModel()
+interface BaseSelectProps {
+    label: string
+    options: Organizer[]
 }
+const props = withDefaults(defineProps<BaseSelectProps>(), {
+    label: ''
+})
 </script>
 
 <template>
-  <div>
-    <h1>Create an event</h1>
-    <form @submit.prevent="saveEvent">
-      <BaseInput v-model="event.category" type="text" label="Category" />
-
-      <h3>Name & describe your event</h3>
-      <BaseInput v-model="event.title" type="text" label="Title" />
-      <BaseInput v-model="event.description" type="text" label="Description" />
-
-      <h3>Where is your event?</h3>
-      <BaseInput v-model="event.location" type="text" label="Location" />
-
-      <h3>Who is your organizer?</h3>
-      <BaseSelect
-        v-model="event.organizer.id"
-        :options="organizers"
-        label="Select an Organizer"
-      />
-
-      <button
-        class="flex w-fit mx-auto items-center justify-center h-13 px-10 rounded-md font-semibold whitespace-nowrap border border-gray-400 focus:border-emerald-500 transition-all duration-200 ease-linear hover:scale-105 hover:border-emerald-500 hover:shadow-lg active:scale-100 focus:outline-none"
-        type="submit"
-      >
-        Submit
-      </button>
-    </form>
-
-    <pre>{{ event }}</pre>
-  </div>
+    <label v-if="label" class="block text-gray-500 font-bold">
+        {{ props.label }}
+    </label>
+    <div class="relative w-1/4 mb-6 mx-auto">
+        <select
+            class="h-13 w-full pl-2.5 pr-6 text-xl align-middle appearance-none rounded-none border border-gray-400 focus:border-emerald-500 focus:outline-none"
+            v-bind="$attrs" v-model="modelValue">
+            <option v-for="option in props.options" :key="option.id" :value="option.id"
+                :selected="option.id === modelValue">
+                {{ option.name }}
+            </option>
+        </select>
+        <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 w-2 h-2.5 fill-gray-700"
+            view-box="0 0 4 5">
+            <path d="M2 0L0 2h4zm0 5L0 3h4z" />
+        </svg>
+    </div>
 </template>

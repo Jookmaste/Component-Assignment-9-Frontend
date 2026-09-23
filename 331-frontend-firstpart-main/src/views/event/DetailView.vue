@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { toRefs } from 'vue'
-import { type Event } from '@/types'
+import { toRefs } from 'vue';
+import type { Event } from '@/types.ts';
 
 const props = defineProps<{
-  event: Event
+    event: Event
 }>()
+
 const { event } = toRefs(props)
 </script>
 
 <template>
-  <p>{{ event.title }} @ {{ event.location }}</p>
-  <p>{{ event.description }}</p>
-  <p>Organized by: {{ event.organizer?.name }}</p>
+    <p>{{ event.time }} @ {{ event.location }}</p>
+    <p>{{ event.description }}</p>
 </template>
